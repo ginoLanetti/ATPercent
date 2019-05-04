@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>ATcontent</title>
+    <script src="../js/plotly-latest.min.js"></script>
+    <script src="../js/AT.js"></script>
+    <link rel="stylesheet" href="../css/AT.css">
+</head>
+
+<body>
+    <div id="page-wrapper">
+        <h1>AT content comparison</h1>
+        <div>
+            <h3>Select a text file:</h3>
+            <input type="file" id="fileInput">
+            <div class="note">
+                <ul>
+                    <li>sequences in fasta format</li>
+                    <li>file with .txt extension</li>
+
+                </ul>
+            </div>
+        </div>
+        <div id="sequence" name="sequence"></div>
+        <label for="range">
+            <h3>Type a nucleotide range length (bp):</h3>
+        </label>
+        <input type="text" id="range" name="range" />
+        <label for="step">
+            <h3>Type a step length (bp):</h3>
+        </label>
+        <input type="text" id="step" name="step" />
+        <h2>Calculate AT content for each sequence seperately (combined chart)</h2>
+        <button onclick="calcAll()" id="calcAll">Calculate</button>
+        <h2>Calculate Average AT content of all given sequences (can take a moment...)</h2>
+        <button onclick="calcAvg()" id="calcAvg">Calculate</button>
+        <div id="progress">
+            <div id="progressBar"></div>
+        </div>
+    </div>
+    <div id="plot"></div>
+</body>
+
+</html>
