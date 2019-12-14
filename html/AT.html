@@ -1,46 +1,56 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="utf-8">
+  <head>
+    <meta charset="utf-8" />
     <title>ATcontent</title>
-    <script src="../js/plotly-latest.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="../js/AT.js"></script>
-    <link rel="stylesheet" href="../css/AT.css">
-</head>
-
-<body>
-    <div id="page-wrapper">
-        <h1>AT content comparison</h1>
-        <div>
-            <h3>Select a text file:</h3>
-            <input type="file" id="fileInput">
-            <div class="note">
-                <ul>
-                    <li>sequences in fasta format</li>
-                    <li>file with .txt extension</li>
-
-                </ul>
-            </div>
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,500i,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/normalize.css" />
+    <link rel="stylesheet" href="../css/AT.css" />
+  </head>
+  <body>
+    <div class="AT__wrapper">
+      <h1 class="AT__header">AT content comparison</h1>
+      <form name="AT-form" class="AT__inputs-area">
+        <div class="AT__sequence-input" class="AT__sequence-input">
+          <h2>Select a text file</h2>
+          <p>.txt/.fasta/.fastq/.fna</p>
+          <label for="fileInput" class="AT__sequence-input-label">choose file</label>
+          <input
+            type="file"
+            name="file"
+            id="fileInput"
+            accept=".txt,.fasta,.fastq,.fna"
+            style="display: none;"
+          />
+          <div class="note"></div>
         </div>
-        <div id="sequence" name="sequence"></div>
-        <label for="range">
+        <div class="AT__range-input">
+          <label for="range">
             <h3>Type a nucleotide range length (bp):</h3>
-        </label>
-        <input type="text" id="range" name="range" />
-        <label for="step">
-            <h3>Type a step length (bp):</h3>
-        </label>
-        <input type="text" id="step" name="step" />
-        <h2>Calculate AT content for each sequence seperately (combined chart)</h2>
-        <button onclick="calcAll()" id="calcAll">Calculate</button>
-        <h2>Calculate Average AT content of all given sequences (can take a moment...)</h2>
-        <button onclick="calcAvg()" id="calcAvg">Calculate</button>
-        <div id="progress">
-            <div id="progressBar"></div>
+          </label>
+          <input type="number" name="range" id="range" name="range" />
         </div>
+        <div class="AT__step-input">
+          <label for="step">
+            <h3>Type a step length (bp):</h3>
+          </label>
+          <input type="number" name="step" id="step" name="step" />
+        </div>
+      </form>
+      <div class="AT__generate-chart">
+        <h2>Calculate AT content for provided sequences</h2>
+        <button onclick="calcAll()" id="calcAll">Calculate</button>
+      </div>
+      <div id="plot-area" class="AT__plot-placeholder">
+        <h2 class="AT__plot-placeholder-text">
+          Your plot will be rendered here
+        </h2>
+      </div>
     </div>
-    <div id="plot"></div>
-</body>
-
+  </body>
 </html>

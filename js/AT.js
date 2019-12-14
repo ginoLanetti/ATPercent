@@ -1,219 +1,126 @@
-let inputSequences = '';
-window.onload = function () {
-    const fileInput = document.getElementById('fileInput');
-    fileInput.addEventListener('change', function (e) {
-        const file = fileInput.files[0];
-        const textType = /text.*/;
-        if (file.type.match(textType)) {
-            let reader = new FileReader();
-            reader.onload = function (e) {
-                inputSequences = reader.result;
-            }
-            reader.readAsText(file);
-        } else {
-            document.getElementById('sequence').innerText = "File not supported!"
-        }
-    });
-}
-const addSequences = () => {
-    let arrayOfSequences = (inputSequences.toLowerCase()).split('>')
-    arrayOfSequences.shift();
-    for (i = 0; i < arrayOfSequences.length; i++) {
-        arrayOfSequences[i] = arrayOfSequences[i].slice(arrayOfSequences[i].search(/\r?\n|\r/g));
-        arrayOfSequences[i] = arrayOfSequences[i].trim().replace(/\r?\n\s|\r\s/g, '');
-    }
-    return arrayOfSequences;
+let inputSequences = "";
+window.onload = function() {
+  const fileInput = document.getElementById("fileInput");
+  fileInput.addEventListener("change", function(e) {
+    const file = fileInput.files[0];
+    const textType = /text.*/;
+      let reader = new FileReader();
+      reader.onload = function(e) {
+        inputSequences = reader.result;
+      };
+      reader.readAsText(file);
+  });
 };
-const addTitles = () => {
-    let arrayOfTitles = (inputSequences.toLowerCase()).split('>')
-    arrayOfTitles.shift();
-    for (i = 0; i < arrayOfTitles.length; i++) {
-        arrayOfTitles[i] = arrayOfTitles[i].substring(0, arrayOfTitles[i].search(/\r?\n|\r/g)).trim();
+const returnSequencesAndLabels = () => {
+  const patterns = {
+    lineBreaks: /(\r\n)+|\r+|\n+|\t+/i,
+    anySpacesOrBreaks: /\r?\n\s|\r\s|\s/g,
+    spacesAround: /\r?\n|\r/g
+  };
+  const mixedData = inputSequences.toLowerCase().split(">");
+  mixedData.shift();
+  const onlySequences = mixedData.map(sequence =>
+    sequence
+      .slice(sequence.search(patterns.lineBreaks))
+      .replace(patterns.anySpacesOrBreaks, "")
+  );
+  const onlyLabels = mixedData.map(label =>
+    label.substring(0, label.search(patterns.spacesAround)).trim()
+  );
+  const sequencesAndLabels = {
+    sequences: onlySequences,
+    labels: onlyLabels
+  };
+  return sequencesAndLabels;
+};
+const returnATPercent = (sequence, startPosition, windowWidth) => {
+  // calculating average AT % for given windowWidth starting from startPosition
+  let countAT = 0;
+  for (let i = startPosition; i < startPosition + windowWidth; i++) {
+    const letterAOrT = sequence[i] === "a" || sequence[i] === "t";
+    if (letterAOrT) {
+      countAT++;
+    }
+  }
+  return (countAT / windowWidth) * 100;
+};
+const returnXs = (sequence, windowWidth, step) => {
+  // creating array of positions for given sequence (X axis values)
+  const positions = [];
+  const lastWindowPosition = sequence.length - windowWidth;
+  for (
+    let position = 0;
+    position < lastWindowPosition;
+    position += step /* <---???? */
+  ) {
+    positions.push(position);
+  }
+  const notFullyCovered =
+    positions[positions.length - 1] + windowWidth < sequence.length;
+  if (notFullyCovered) {
+    positions.push(lastWindowPosition);
+  }
+  return positions;
+};
 
-    }
-    return arrayOfTitles;
-}
-const addRange = () => {
-    let num = Number(document.getElementById("range").value);
-    return num;
-}
-const addStep = () => {
-    let text = Number(document.getElementById("step").value);
-    return text;
-}
-const stepToPositions = (array, step) => {
-    let positions = [];
-    for (let i = 0; i < array.length; i += step) {
-        positions.push(i);
-    }
-    return positions;
-}
-const atPairPercent = (array, start, range) => {
-    let countAT = 0;
-    for (let i = start; i < (start + range); i++) {
-        if ((array[i] === 'a') || (array[i] === 't')) {
-            countAT++
-        }
-    }
-    return (countAT / range) * 100;
-}
-const returnEndResult = (array, range, counter) => {
-    let endResult = [];
-    let positions = stepToPositions(addSequences()[counter], addStep());
-    for (const position of positions) {
-        endResult.push(atPairPercent(array, position, range));
-    };
-    return endResult;
-}
-const returnEndResultTrunc = (counter) => {
-    const sequenceArray = addSequences()[counter];
-    let endResultTrunc = returnEndResult(addSequences()[counter], addRange(), counter);
-    let division = Math.ceil(addRange() / addStep())
-    if ((addRange() === addStep()) && (sequenceArray % addRange() !== 0)) {
-        endResultTrunc.pop();
-        endResultTrunc.push(atPairPercent(sequenceArray, (sequenceArray.length - 1) - addRange(), addRange()));
-    } else if (addStep() <= 1) {
-        endResultTrunc.splice((endResultTrunc.length - division), division);
-    } else if (addStep() > 1) {
-        endResultTrunc.splice((endResultTrunc.length - division), division);
-        endResultTrunc.push(atPairPercent(sequenceArray, (sequenceArray.length - 1) - addRange(), addRange()));
-    }
-    return endResultTrunc;
-}
-const returnPositionsTrunc = (counter) => {
-    const sequenceArray = addSequences()[counter];
-    let positionsTrunc = stepToPositions(addSequences()[counter], addStep());
-    let division = Math.ceil(addRange() / addStep())
-    if ((addRange() === addStep()) && (sequenceArray % addRange() !== 0)) {
-        positionsTrunc.pop();
-        positionsTrunc.push((sequenceArray.length - 1) - addRange());
-    } else if (addStep() <= 1) {
-        positionsTrunc.splice((positionsTrunc.length - division), division);
-    } else if (addStep() > 1) {
-        positionsTrunc.splice((positionsTrunc.length - division), division);
-        positionsTrunc.push((sequenceArray.length - 1) - addRange());
-    }
-    return positionsTrunc;
-}
-const atPairCount = (array, start, range) => {
-    let countAT = 0;
-    for (let i = start; i < (start + range); i++) {
-        if ((array[i] === 'a') || (array[i] === 't')) {
-            countAT++
-        }
-    }
-    return countAT;
-}
-const returnEndCount = (array, range, counter) => {
-    let endCount = [];
-    let positions = stepToPositions(addSequences()[counter], addStep());
-    for (const position of positions) {
-        endCount.push(atPairCount(array, position, range));
-    };
-    return endCount;
-}
-const returnEndCountTrunc = (counter) => {
-    const sequenceArray = addSequences()[counter];
-    let endCountTrunc = returnEndCount(addSequences()[counter], addRange(), counter);
-    let division = Math.ceil(addRange() / addStep())
-    if ((addRange() === addStep()) && (sequenceArray % addRange() !== 0)) {
-        endCountTrunc.pop();
-        endCountTrunc.push(atPairCount(sequenceArray, (sequenceArray.length - 1) - addRange(), addRange()));
-    } else if (addStep() <= 1) {
-        endCountTrunc.splice((endCountTrunc.length - division), division);
-    } else if (addStep() > 1) {
-        endCountTrunc.splice((endCountTrunc.length - division), division);
-        endCountTrunc.push(atPairCount(sequenceArray, (sequenceArray.length - 1) - addRange(), addRange()));
-    }
-    return endCountTrunc;
-}
-const displayEndResult = (counter) => {
-    let displayEndResult = ''
-    let endResultTrunc = returnEndResultTrunc(counter);
-    let positionsTrunc = returnPositionsTrunc(counter);
-    for (let i = 0; i < endResultTrunc.length; i++) {
-        displayEndResult += `<br> ${endResultTrunc[i]}-${positionsTrunc[i]}-${positionsTrunc[i] + addRange()}`
-    };
-    displayEndResult += '<br>'
-    return displayEndResult;
-}
-const displayRow = (title, resultRow) => {
-    let html = ``;
-    html += `<tr><td>${title}</td>`;
-    for (let i = 0; i < resultRow.length; i++) {
-        html += '<td>' + resultRow[i] + '</td>';
-    }
-    html += '</tr>'
-    return html
-}
-const loadingBar = () => {
-    let elem = document.getElementById("progressBar");
-    let width = 1;
-    let frame = () => {
-        if (width >= 100) {
-            clearInterval(id);
-        } else {
-            width++;
-            elem.style.width = width + '%';
-        }
-    }
-    let id = setInterval(frame, 0.1);
-}
+const returnYs = (positions, sequence, windowWidth) => {
+  // creating array of AT% for each windowWidth for given sequence (Y axis values)
+  const atPercentArray = positions.map(position =>
+    returnATPercent(sequence, position, windowWidth)
+  );
+  return atPercentArray;
+};
+const returnPlotDatasets = (labels, sequences, windowWidth, step) => {
+  // creating datasets for plot rendering
+  const multipleXYDatasets = [];
+  for (const [seqIndex, sequence] of sequences.entries()) {
+    const xValues = returnXs(sequence, windowWidth, step);
+    const yValues = returnYs(xValues, sequence, windowWidth);
+    multipleXYDatasets.push(
+      trace = {
+        x: xValues,
+        y: yValues,
+        type: "scatter",
+        name: labels[seqIndex],
+        mode: "lines+markers"
+      });
+  }
+  return multipleXYDatasets;
+};
 const calcAll = () => {
-    let data = [];
-    for (let i = 0; i < addSequences().length; i++) {
-        data.push(
-            trace = {
-                x: returnPositionsTrunc(i),
-                y: returnEndResultTrunc(i),
-                type: 'scatter',
-                name: `${addTitles()[i]}`,
-                mode: 'lines+markers'
-            });
-    }
-    var layout = {
-        title: 'AT content',
-        xaxis: {
-            title: 'Position of range beginning [bp]',
-        },
-        yaxis: {
-            title: 'AT content [%]',
+    const fileValue = document.forms["AT-form"]["file"].value
+    const rangeValue = document.forms["AT-form"]["range"].value
+    const stepValue = document.forms["AT-form"]["step"].value
+    if (fileValue == "") {
+        alert("Please upload a file");
+    } else if (rangeValue <= 0) {
+        alert("minimal range value is 1");
+    } else if (stepValue <= 0) {
+        alert("minimal step value is 1");
+    } else {
+        const windowWidth = Number(document.getElementById("range").value);
+        const step = Number(document.getElementById("step").value)
+        const {labels, sequences} = returnSequencesAndLabels();
+        const datasets = returnPlotDatasets(labels, sequences, windowWidth, step);
+        const layout = {
+            title: 'AT content',
+            xaxis: {
+                title: 'Position of range beginning [bp]',
+            },
+            yaxis: {
+                title: 'AT content [%]',
+            }
+        };
+        let isPlotlyDone = false;
+        const plotDiv = document.getElementById('plot-area')
+        if(!isPlotlyDone){
+            plotDiv.innerHTML='';
         }
-    };
-    Plotly.newPlot('plot', data, layout);
-    loadingBar();
+        Plotly.plot(plotDiv, datasets, layout).then(function() {
+            isPlotlyDone = true;
+        });
+        Plotly.newPlot('plot-area', datasets, layout);
+    }
 }
-const calcAvg = () => {
-    let countSum = [];
-    let countAvg = [];
-    for (let a = 0; a < returnEndCountTrunc(0).length; a++) {
-        countSum.push(0);
-    }
-    for (let i = 0; i < addSequences().length; i++) {
-        for (let j = 0; j < returnEndCountTrunc(i).length; j++) {
-            countSum[j] += returnEndCountTrunc(i)[j];
-        }
-    }
-    for (count of countSum) {
-        countAvg.push(((count / addSequences().length) / addRange()) * 100)
-    }
-    let trace = {
-        x: returnPositionsTrunc(0),
-        y: countAvg,
-        type: 'scatter',
-        name: 'Average AT content',
-        mode: 'lines+markers'
-    }
-    let data = [trace];
-    var layout = {
-        title: 'Average AT content',
-        xaxis: {
-            title: 'Position of first nucleotide from each chosen range [bp]',
-        },
-        yaxis: {
-            title: 'AT content [%]',
-        }
-    };
-    Plotly.newPlot('plot', data, layout);
-    loadingBar();
-}
+
+
