@@ -1,19 +1,13 @@
-
-
-:root {
-  --light-grey: #e6e6e6;
-  --light-color: #bad8e1;
-  --whitish: #f8f9f9;
-}
-html{ box-sizing: border-box;}
-
-body {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 100%;
-  background: var(--light-color);
+html {
   box-sizing: border-box;
 }
-h2{
+body {
+  font-family: "Montserrat", sans-serif;
+  font-size: 100%;
+  background: #bad8e1;
+  box-sizing: border-box;
+}
+h2 {
   font-size: 1rem;
 }
 label {
@@ -26,10 +20,10 @@ label {
   align-items: center;
   width: 60vw;
   height: 100vh;
-  background: var(--whitish);
+  background:  #f8f9f9;
   margin: 0 auto;
   min-height: 300px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 .AT__header {
   font-size: 2.5rem;
@@ -37,9 +31,9 @@ label {
   color: #035e83;
 }
 .AT__inputs-area {
-display: flex;
-flex-direction: column;
-align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .AT__sequence-input {
   display: flex;
@@ -60,23 +54,20 @@ align-items: center;
   align-items: center;
 }
 .AT__sequence-input p {
-  /* width: 10rem; */
-  /* margin: 0 auto; */
   background-color: aliceblue;
 }
-.AT__sequence-input-label{
+.AT__sequence-input-label {
   color: #fff;
   text-transform: uppercase;
   text-decoration: none;
   background: goldenrod;
   padding: 0.6rem;
-  /* width: 10rem; */
   border-radius: 0.1rem;
   display: inline-block;
   border: none;
 }
 .AT__generate-chart {
-    display: flex;
+  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -100,8 +91,8 @@ align-items: center;
   height: 45vh;
   margin-top: 1rem;
   width: 90%;
-  background-color: var(--light-grey);
-  color:  goldenrod;
+  background-color: #e6e6e6;
+  color: goldenrod;
 }
 .AT__plot-placeholder-text {
   font-size: 3rem;
